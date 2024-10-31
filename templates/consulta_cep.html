@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Consulta de Endereço</title>
+    <style>
+        .container {
+            max-width: 500px;
+            margin: 20px auto;
+            font-family: Arial, sans-serif;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            background-color: #f9f9f9;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input[type="text"] {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            width: 100%;
+        }
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .navigation {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .navigation a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .navigation a:hover {
+            color: #0056b3;
+        }
+        .endereco-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .endereco-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        .no-result {
+            text-align: center;
+            color: #888;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Consulta de Endereço por CEP</h2>
+        <form method="GET" action="/consulta_cep">
+            <div class="form-group">
+                <label for="cep">Digite o CEP:</label>
+                <input type="text" id="cep" name="cep" placeholder="Ex: 80240480" required>
+            </div>
+            <button type="submit">Consultar Endereço</button>
+        </form>
+
+        {% if dados_endereco %}
+            <h2>Dados do Endereço</h2>
+            <table class="endereco-table">
+                <tr>
+                    <td><strong>Logradouro:</strong></td>
+                    <td>{{ dados_endereco['logradouro'] }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Bairro:</strong></td>
+                    <td>{{ dados_endereco['bairro'] }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Cidade:</strong></td>
+                    <td>{{ dados_endereco['localidade'] }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Estado:</strong></td>
+                    <td>{{ dados_endereco['uf'] }}</td>
+                </tr>
+            </table>
+        {% else %}
+            <p class="no-result">Nenhum endereço encontrado.</p>
+        {% endif %}
+    </div>
+    
+    <div class="navigation">
+        <a href="./index.html"">Voltar para a Página Principal</a>
+    </div>
+</body>
+</html>

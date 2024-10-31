@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Consulta de Cliente</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        p {
+            font-size: 1em;
+            color: #555;
+            line-height: 1.5;
+            margin: 5px 0;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #0056b3;
+        }
+        .navigation {
+            margin-top: 15px;
+        }
+        .navigation a {
+            margin: 0 10px;
+            color: #0056b3;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .navigation a:hover {
+            text-decoration: underline;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        input[type="email"] {
+            padding: 10px;
+            font-size: 1em;
+            width: 100%;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            background-color: #0056b3;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #003f7f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Consulta de Cliente</h2>
+        
+        
+        <form method="GET" action="/consultar_cliente">
+            <div class="form-group">
+                <label for="email">Digite o Email do Cliente:</label>
+                <input type="email" name="email" id="email" required>
+            </div>
+            <button type="submit">Consultar</button>
+        </form>
+        
+        
+        {% if cliente %}
+            <h2>Dados do Cliente</h2>
+            <p><span class="highlight">Nome:</span> {{ cliente[0] }}</p>
+            <p><span class="highlight">Email:</span> {{ cliente[1] }}</p>
+            <p><span class="highlight">Possui Deficiência:</span> {{ 'Sim' if cliente[2] else 'Não' }}</p>
+            <p><span class="highlight">É Idoso:</span> {{ 'Sim' if cliente[3] else 'Não' }}</p>
+        {% else %}
+            <h2>Nenhum cliente encontrado.</h2>
+        {% endif %}
+
+        
+        <div class="navigation">
+            <a href="./index.html">Página Principal</a> |
+            <a href="./cadastrar_cliente.html">Cadastrar Cliente</a> |
+            <a href="./consulta_cep.html"">Consultar CEP</a>
+        </div>
+    </div>
+</body>
+</html>
