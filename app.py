@@ -2,7 +2,7 @@ import re
 import json
 import cx_Oracle
 import requests
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 
 DB_USER = 'RM557129'
 DB_PASSWORD = '100306'
@@ -13,6 +13,7 @@ DB_SERVICE = 'ORCL'
 dsn = cx_Oracle.makedsn(DB_HOST, DB_PORT, service_name=DB_SERVICE)
 
 app = Flask(__name__)
+app.secret_key = 'sua_chave_secreta'  # Necessária para usar flash messages
 
 def conectar_bd():
     try:
@@ -45,6 +46,7 @@ def cadastrar_cliente():
         
         email = request.form['email']
         senha = request.form['senha']
+        cep = request.form['cep']  # Captura o CEP do formulário
         
         if not validar_email(email):
             print("Email inválido.")
@@ -57,8 +59,8 @@ def cadastrar_cliente():
         if connection:
             try:
                 cursor = connection.cursor()
-                cursor.execute("""INSERT INTO t_as_cliente (id_nome, id_email, cd_senha, pcd, idoso) VALUES (:1, :2, :3, :4, :5)""",
-                               (nome, email, senha, pcd, idoso))
+                cursor.execute("""INSERT INTO T_AS_CLIENTE (id_nome, id_email, cd_senha, cd_cep, pcd, idoso) VALUES (:1, :2, :3, :4, :5, :6)""",
+                               (nome, email, senha, cep, pcd, idoso))
                 connection.commit()
                 print("Cliente cadastrado com sucesso.")
             except cx_Oracle.DatabaseError as e:
@@ -76,45 +78,37 @@ def cadastrar_cliente():
 @app.route('/consultar_cliente', methods=['GET'])
 def consultar_cliente():
     email = request.args.get('email')
+    print(f"Consultando cliente com email: {email}")  # Para debugging
     connection = conectar_bd()
     if connection:
         cursor = connection.cursor()
-        cursor.execute("""SELECT id_nome, id_email, pcd, idoso FROM t_as_cliente WHERE id_email = :1""", (email,))
+        cursor.execute("""SELECT id_nome, id_email, cd_cep, pcd, idoso FROM T_AS_CLIENTE WHERE id_email = :1""", (email,))
         cliente = cursor.fetchone()
         cursor.close()
         connection.close()
         
+        print(f"Cliente encontrado: {cliente}")  # Para ver o que foi retornado
+        
         if cliente:
-            exportar_cliente_para_json(cliente)
-            return json.dumps({
-                "nome": cliente[0],
-                "email": cliente[1],
-                "pcd": cliente[2],
-                "idoso": cliente[3]
-            })
-        return "Cliente não encontrado.", 404
+            return render_template('consultar_cliente.html', cliente=cliente)
+        return render_template('consultar_cliente.html', cliente=None)
     return "Erro de conexão com o banco de dados.", 500
 
-def exportar_cliente_para_json(cliente):
-    with open(f"{cliente[1]}.json", 'w') as json_file:
-        json.dump({
-            "nome": cliente[0],
-            "email": cliente[1],
-            "pcd": cliente[2],
-            "idoso": cliente[3]
-        }, json_file)
 
 @app.route('/consulta_cep', methods=['GET'])
 def consulta_cep():
     cep = request.args.get('cep')
-    response = requests.get(f'https://viacep.com.br/ws/{cep}/json/')
-    if response.status_code == 200:
-        dados_endereco = response.json()
-        if "erro" not in dados_endereco:
-            return json.dumps(dados_endereco)
+    dados_endereco = None
+
+    if cep:
+        response = requests.get(f"https://viacep.com.br/ws/{cep}/json/")
+        
+        if response.status_code == 200:
+            dados_endereco = response.json()
         else:
-            return "CEP não encontrado.", 404
-    return "Erro ao consultar o CEP.", 500
+            flash("Erro ao consultar o CEP. Verifique se o CEP está correto.", "error")
+
+    return render_template('consulta_cep.html', dados_endereco=dados_endereco)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True) 
