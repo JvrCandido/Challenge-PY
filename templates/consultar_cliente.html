@@ -68,9 +68,22 @@
             color: #fff;
             background-color: #0056b3;
             cursor: pointer;
+            margin-top: 10px;
         }
         button:hover {
             background-color: #003f7f;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .delete-button {
+            background-color: #d9534f;
+        }
+        .delete-button:hover {
+            background-color: #c9302c;
         }
     </style>
 </head>
@@ -92,6 +105,17 @@
             <p><span class="highlight">CEP:</span> {{ cliente[2] }}</p>
             <p><span class="highlight">Possui Deficiência:</span> {{ 'Sim' if cliente[3] else 'Não' }}</p>
             <p><span class="highlight">É Idoso:</span> {{ 'Sim' if cliente[4] else 'Não' }}</p>
+
+            <div class="button-container">
+                <a href="{{ url_for('alterar_cliente', email=cliente[1]) }}">
+                    <button type="button">Alterar Cliente</button>
+                </a>
+                
+                <form action="{{ url_for('deletar_cliente') }}" method="POST" style="display: inline;">
+                    <input type="hidden" name="email" value="{{ cliente[1] }}">
+                    <button type="submit" class="delete-button" onclick="return confirm('Tem certeza que deseja deletar este cliente?')">Deletar Cliente</button>
+                </form>
+            </div>
         {% else %}
             <h2>Nenhum cliente encontrado.</h2>
         {% endif %}
@@ -104,3 +128,6 @@
     </div>
 </body>
 </html>
+
+
+

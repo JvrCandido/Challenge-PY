@@ -94,6 +94,70 @@ def consultar_cliente():
         return render_template('consultar_cliente.html', cliente=None)
     return "Erro de conexão com o banco de dados.", 500
 
+@app.route('/alterar_cliente/<email>', methods=['GET', 'POST'])
+def alterar_cliente(email):
+    connection = conectar_bd()
+    if not connection:
+        return "Erro de conexão com o banco de dados.", 500
+
+    if request.method == 'POST':
+        # Obter dados do formulário para atualização
+        nome = request.form['nome']
+        cep = request.form['cep']
+        pcd = 'sim' == request.form.get('pcd')
+        idoso = 'sim' == request.form.get('idoso')
+
+        try:
+            cursor = connection.cursor()
+            cursor.execute("""UPDATE T_AS_CLIENTE
+                              SET id_nome = :1, cd_cep = :2, pcd = :3, idoso = :4
+                              WHERE id_email = :5""",
+                           (nome, cep, pcd, idoso, email))
+            connection.commit()
+            flash("Cliente atualizado com sucesso!", "success")
+            return redirect(url_for('consultar_cliente', email=email))
+        except cx_Oracle.DatabaseError as e:
+            error, = e.args
+            flash(f"Erro ao atualizar cliente: {error.message}", "error")
+        finally:
+            cursor.close()
+            connection.close()
+    else:
+        # Consultar cliente para exibir dados no formulário de atualização
+        cursor = connection.cursor()
+        cursor.execute("""SELECT id_nome, id_email, cd_cep, pcd, idoso
+                          FROM T_AS_CLIENTE
+                          WHERE id_email = :1""", (email,))
+        cliente = cursor.fetchone()
+        cursor.close()
+        connection.close()
+        
+        if cliente:
+            return render_template('alterar_cliente.html', cliente=cliente)
+        else:
+            flash("Cliente não encontrado.", "error")
+            return redirect(url_for('index'))
+
+@app.route('/deletar_cliente', methods=['POST'])
+def deletar_cliente():
+    email = request.form['email']
+    connection = conectar_bd()
+    if not connection:
+        return "Erro de conexão com o banco de dados.", 500
+
+    try:
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM T_AS_CLIENTE WHERE id_email = :1", (email,))
+        connection.commit()
+        flash("Cliente deletado com sucesso!", "success")
+    except cx_Oracle.DatabaseError as e:
+        error, = e.args
+        flash(f"Erro ao deletar cliente: {error.message}", "error")
+    finally:
+        cursor.close()
+        connection.close()
+
+    return redirect(url_for('index'))
 
 @app.route('/consulta_cep', methods=['GET'])
 def consulta_cep():
@@ -111,4 +175,4 @@ def consulta_cep():
     return render_template('consulta_cep.html', dados_endereco=dados_endereco)
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=True)

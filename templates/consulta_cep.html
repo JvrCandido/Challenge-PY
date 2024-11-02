@@ -129,7 +129,7 @@
         {% endif %}
         {% endwith %}
 
-        <form method="GET" action="{{ url_for('consulta_cep') }}">
+        <form method="GET" action="http://127.0.0.1:5000/consulta_cep">
             <div class="form-group">
                 <label for="cep">Digite o CEP:</label>
                 <input type="text" id="cep" name="cep" placeholder="Ex: 80240-480" required>
@@ -168,5 +168,4 @@
         <a href="http://127.0.0.1:5000/consultar_cliente">Consultar Cliente</a>
     </div>
 </body>
-
 </html>
