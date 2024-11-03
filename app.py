@@ -78,7 +78,7 @@ def cadastrar_cliente():
 @app.route('/consultar_cliente', methods=['GET'])
 def consultar_cliente():
     email = request.args.get('email')
-    print(f"Consultando cliente com email: {email}")  # Para debugging
+    print(f"Consultando cliente com email: {email}")  
     connection = conectar_bd()
     cliente = None
     
@@ -87,7 +87,7 @@ def consultar_cliente():
             cursor = connection.cursor()
             cursor.execute("""SELECT id_nome, id_email, cd_cep, pcd, idoso FROM T_AS_CLIENTE WHERE id_email = :1""", (email,))
             cliente = cursor.fetchone()
-            print(f"Cliente encontrado: {cliente}")  # Para ver o que foi retornado
+            print(f"Cliente encontrado: {cliente}")  
         except cx_Oracle.DatabaseError as e:
             error, = e.args
             flash(f"Erro ao consultar cliente: {error.message}", "error")
