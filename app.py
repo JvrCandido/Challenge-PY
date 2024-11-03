@@ -80,19 +80,22 @@ def consultar_cliente():
     email = request.args.get('email')
     print(f"Consultando cliente com email: {email}")  # Para debugging
     connection = conectar_bd()
+    cliente = None
+    
     if connection:
-        cursor = connection.cursor()
-        cursor.execute("""SELECT id_nome, id_email, cd_cep, pcd, idoso FROM T_AS_CLIENTE WHERE id_email = :1""", (email,))
-        cliente = cursor.fetchone()
-        cursor.close()
-        connection.close()
-        
-        print(f"Cliente encontrado: {cliente}")  # Para ver o que foi retornado
-        
-        if cliente:
-            return render_template('consultar_cliente.html', cliente=cliente)
-        return render_template('consultar_cliente.html', cliente=None)
-    return "Erro de conexão com o banco de dados.", 500
+        try:
+            cursor = connection.cursor()
+            cursor.execute("""SELECT id_nome, id_email, cd_cep, pcd, idoso FROM T_AS_CLIENTE WHERE id_email = :1""", (email,))
+            cliente = cursor.fetchone()
+            print(f"Cliente encontrado: {cliente}")  # Para ver o que foi retornado
+        except cx_Oracle.DatabaseError as e:
+            error, = e.args
+            flash(f"Erro ao consultar cliente: {error.message}", "error")
+        finally:
+            cursor.close()
+            connection.close()
+    
+    return render_template('consultar_cliente.html', cliente=cliente)
 
 @app.route('/alterar_cliente/<email>', methods=['GET', 'POST'])
 def alterar_cliente(email):
@@ -101,7 +104,6 @@ def alterar_cliente(email):
         return "Erro de conexão com o banco de dados.", 500
 
     if request.method == 'POST':
-        # Obter dados do formulário para atualização
         nome = request.form['nome']
         cep = request.form['cep']
         pcd = 'sim' == request.form.get('pcd')
@@ -123,7 +125,6 @@ def alterar_cliente(email):
             cursor.close()
             connection.close()
     else:
-        # Consultar cliente para exibir dados no formulário de atualização
         cursor = connection.cursor()
         cursor.execute("""SELECT id_nome, id_email, cd_cep, pcd, idoso
                           FROM T_AS_CLIENTE

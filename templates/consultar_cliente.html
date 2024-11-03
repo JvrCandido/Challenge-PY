@@ -85,12 +85,16 @@
         .delete-button:hover {
             background-color: #c9302c;
         }
+        .message {
+            color: #d9534f;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Consulta de Cliente</h2>
-        <form method="GET" action="{{ url_for('consultar_cliente') }}">
+        <form method="GET" action="http://127.0.0.1:5000/consultar_cliente">
             <div class="form-group">
                 <label for="email">Digite o Email do Cliente:</label>
                 <input type="email" name="email" id="email" required>
@@ -117,7 +121,7 @@
                 </form>
             </div>
         {% else %}
-            <h2>Nenhum cliente encontrado.</h2>
+            <p class="message">Nenhum cliente encontrado.</p>
         {% endif %}
 
         <div class="navigation">
@@ -128,6 +132,3 @@
     </div>
 </body>
 </html>
-
-
-
