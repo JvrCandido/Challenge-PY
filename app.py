@@ -13,7 +13,7 @@ DB_SERVICE = 'ORCL'
 dsn = cx_Oracle.makedsn(DB_HOST, DB_PORT, service_name=DB_SERVICE)
 
 app = Flask(__name__)
-app.secret_key = 'sua_chave_secreta'  # Necessária para usar flash messages
+app.secret_key = 'sua_chave_secreta'  
 
 def conectar_bd():
     try:
@@ -46,7 +46,7 @@ def cadastrar_cliente():
         
         email = request.form['email']
         senha = request.form['senha']
-        cep = request.form['cep']  # Captura o CEP do formulário
+        cep = request.form['cep']  
         
         if not validar_email(email):
             print("Email inválido.")
