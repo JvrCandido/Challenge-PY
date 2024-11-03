@@ -79,23 +79,36 @@ def cadastrar_cliente():
 def consultar_cliente():
     email = request.args.get('email')
     print(f"Consultando cliente com email: {email}")  
+    
     connection = conectar_bd()
+    if not connection:
+        print("Erro ao conectar ao banco de dados.")
+        flash("Erro ao conectar ao banco de dados.", "error")
+        return render_template('consultar_cliente.html', cliente=None)
+
     cliente = None
     
-    if connection:
-        try:
-            cursor = connection.cursor()
-            cursor.execute("""SELECT id_nome, id_email, cd_cep, pcd, idoso FROM T_AS_CLIENTE WHERE id_email = :1""", (email,))
-            cliente = cursor.fetchone()
-            print(f"Cliente encontrado: {cliente}")  
-        except cx_Oracle.DatabaseError as e:
-            error, = e.args
-            flash(f"Erro ao consultar cliente: {error.message}", "error")
-        finally:
-            cursor.close()
-            connection.close()
+    try:
+        cursor = connection.cursor()
+        cursor.execute("""SELECT id_nome, id_email, cd_cep, pcd, idoso FROM T_AS_CLIENTE WHERE id_email = :1""", (email,))
+        cliente = cursor.fetchone()
+        print(f"Cliente encontrado: {cliente}")  
+    except cx_Oracle.DatabaseError as e:
+        error, = e.args
+        print(f"Erro ao consultar cliente: {error.message}")  
+        flash(f"Erro ao consultar cliente: {error.message}", "error")
+    finally:
+        cursor.close()
+        connection.close()
+
     
-    return render_template('consultar_cliente.html', cliente=cliente)
+    if cliente:
+        return render_template('consultar_cliente.html', cliente=cliente)
+    else:
+        flash("Nenhum cliente encontrado.", "warning") 
+        return render_template('consultar_cliente.html', cliente=None)  
+
+
 
 @app.route('/alterar_cliente/<email>', methods=['GET', 'POST'])
 def alterar_cliente(email):
