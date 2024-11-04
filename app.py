@@ -4,6 +4,14 @@ import cx_Oracle
 import requests
 from flask import Flask, render_template, request, redirect, url_for, flash
 
+
+try:
+    cx_Oracle.init_oracle_client()
+    print("Oracle Client configurado corretamente!")
+except cx_Oracle.DatabaseError as e:
+    error, = e.args
+    print(f"Erro ao configurar o Oracle Client: {error.message}")
+
 DB_USER = 'RM557129'
 DB_PASSWORD = '100306'
 DB_HOST = 'oracle.fiap.com.br'
@@ -101,14 +109,11 @@ def consultar_cliente():
         cursor.close()
         connection.close()
 
-    
     if cliente:
         return render_template('consultar_cliente.html', cliente=cliente)
     else:
         flash("Nenhum cliente encontrado.", "warning") 
         return render_template('consultar_cliente.html', cliente=None)  
-
-
 
 @app.route('/alterar_cliente/<email>', methods=['GET', 'POST'])
 def alterar_cliente(email):

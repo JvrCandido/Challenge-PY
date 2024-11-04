@@ -2,6 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consulta de Cliente</title>
     <style>
         body {
@@ -59,6 +60,11 @@
             margin-top: 5px;
             border-radius: 5px;
             border: 1px solid #ccc;
+            transition: border-color 0.3s;
+        }
+        input[type="email"]:focus {
+            border-color: #0056b3;
+            outline: none;
         }
         button {
             padding: 10px 20px;
@@ -69,6 +75,7 @@
             background-color: #0056b3;
             cursor: pointer;
             margin-top: 10px;
+            transition: background-color 0.3s;
         }
         button:hover {
             background-color: #003f7f;
@@ -89,15 +96,28 @@
             color: #d9534f;
             font-weight: bold;
         }
+        @media (max-width: 500px) {
+            .container {
+                width: 90%;
+                padding: 15px;
+            }
+            h2 {
+                font-size: 1.2em;
+            }
+            button {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Consulta de Cliente</h2>
-        <form method="GET" action="http://127.0.0.1:5000/consultar_cliente">
+        <form method="GET" action="http://127.0.0.1:5000/consultar_cliente" aria-label="Formulário de Consulta de Cliente">
             <div class="form-group">
                 <label for="email">Digite o Email do Cliente:</label>
-                <input type="email" name="email" id="email" required>
+                <input type="email" name="email" id="email" required aria-required="true" aria-describedby="emailHelp">
+                <small id="emailHelp" class="form-text text-muted">Por favor, insira um endereço de email válido.</small>
             </div>
             <button type="submit">Consultar</button>
         </form>
